@@ -119,6 +119,7 @@ class DenseImageModel(BaseImageModel):
         x = tf.layers.flatten(self.inputs)
         for modules, units in self.config.dense_layers:
             x = _dense_modular_layer(x, modules, units, context)
+            x = tf.nn.relu(x)
         return tf.layers.dense(x, self.num_labels)
 
 
