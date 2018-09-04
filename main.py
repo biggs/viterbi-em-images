@@ -13,20 +13,19 @@ if __name__ == "__main__":
     RUN_NAME = 'MNIST_Depth_Comparison_with_relu'
 
     possible_dense_layers = [
-        ((5, 20), (1, 100), (1, 100)),
-        ((1, 100), (5, 20), (1, 100)),
         ((1, 100), (1, 100), (5, 20)),
     ]
 
     CONFIG = {
         "eval_metric": "class/accuracy",
         "batch_size": 128,
-        "m_steps": ray.tune.grid_search([10, 20, 30]),
+        "m_steps": ray.tune.grid_search([10,]),
         "optimizer": 'RMSPropOptimizer',
         "sample_size": 8,
         "learning_rate": 0.001,
         "dense_layers": ray.tune.grid_search(possible_dense_layers),
         "sampled_evals": True,
+        "epochs_per_complete_e": ray.tune.grid_search([3,]),
     }
 
     train_spec = {

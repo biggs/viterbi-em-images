@@ -35,9 +35,9 @@ class DataLoader(object):
         self.train_epoch_size = int(self.dataset_size/batch_size)
 
         # Train. Random ordering.
-        train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-        train = train._enumerate().repeat().shuffle(self.dataset_size)
-        self._train = train.batch(batch_size)
+        train = tf.data.Dataset.from_tensor_slices((x_train, y_train))._enumerate()
+        self._train = train.repeat().shuffle(self.dataset_size).batch(batch_size)
+        self._train_complete = train.batch(batch_size)
 
         # Validation.
         valid_dummy_indices = tf.zeros([x_valid.shape[0]], dtype=tf.int64)
@@ -57,9 +57,13 @@ class DataLoader(object):
         return {self._handle: _make_handle(sess, self._train),
                 self.is_training: True}
 
+    def get_dict_train_complete(self, sess):
+        return {self._handle: _make_handle(sess, self._train_complete),
+                self.is_training: True}
+
     def get_dict_valid(self, sess):
         return {self._handle: _make_handle(sess, self._valid),
-                self.is_training: True}
+                self.is_training: False}
 
     def _preprocess(inputs, labels):
         pass

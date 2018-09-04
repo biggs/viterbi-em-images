@@ -25,6 +25,8 @@ class Experiment(Trainable):
         self.sess.run(tf.global_variables_initializer())
         self.dict_train = self.data.get_dict_train(self.sess)
 
+        self.num_complete_e = 0
+
     def _evaluations_valid(self, evaluations):
         dict_valid = self.data.get_dict_valid(self.sess)
         evaluations_sum, proportions_sum = self.sess.run(evaluations, dict_valid)
@@ -56,10 +58,24 @@ class Experiment(Trainable):
                                  self.dict_train)
         return evals
 
+    def _complete_e_step(self):
+        dict_train_complete = self.data.get_dict_train_complete(self.sess)
+        while True:
+            try:
+                self.sess.run(self.model.e_step, dict_train_complete)
+            except tf.errors.OutOfRangeError:
+                break
 
     def _train(self):
-        # Run training and get evaluation.
         train_steps = self.data.train_epoch_size
+
+        # Complete E Step if needed.
+        if self._iteration % self.config["epochs_per_complete_e"] == 0:
+            print('Complete E Step')
+            self.num_complete_e += 1
+            self._complete_e_step()
+
+        # Run training and get evaluation.
         evals_train, proportions_train = self._train_steps(train_steps)
 
         # Run Validation Evaluations.
