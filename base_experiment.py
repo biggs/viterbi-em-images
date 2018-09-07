@@ -7,6 +7,7 @@ from ray.tune import TrainingResult
 
 import base_model
 from load_data import MnistLoader
+from load_data import CifarLoader
 from utils import AttrDict
 
 
